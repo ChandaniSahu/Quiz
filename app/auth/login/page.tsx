@@ -1,10 +1,31 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { getSession } from 'next-auth/react';
 import GoogleLoginBtn from '@/components/auth/GoogleLoginBtn';
 import RoleSelector from '@/components/auth/RoleSelector';
 
 export default function LoginPage() {
   const [selectedRole, setSelectedRole] = useState<'candidate' | 'organizer' | null>(null);
+  const [checking, setChecking] = useState(true);
+
+  useEffect(() => {
+    getSession().then(session => {
+      if (session?.user) {
+        // Already logged in - redirect away from login page
+        window.location.href = '/';
+      } else {
+        setChecking(false);
+      }
+    });
+  }, []);
+
+  if (checking) {
+    return (
+      <div className="flex items-center justify-center min-h-[80vh]">
+        <div className="text-gray-500 text-lg">Loading...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex items-center justify-center min-h-[80vh]">
